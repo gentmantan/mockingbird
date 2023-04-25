@@ -9,6 +9,7 @@ from run_nlg import generate_text as nlg_gs
 from run_markov import generate_text as markov_gs
 
 class MyAPIOptionsBox(QDialog):
+    values_selected = pyqtSignal(str, str)
     def __init__(self):
         super(MyAPIOptionsBox, self).__init__()
 
@@ -18,15 +19,14 @@ class MyAPIOptionsBox(QDialog):
         self.setWindowIcon(QIcon('icon.png'))
 
         layout = QVBoxLayout()
-        self.setLayout(layout)
 
         self.label1 = QLabel()
         # self.label1.setFont(QFont('Arial', 14))
         self.label1.setText("Consumer Key:")
         layout.addWidget(self.label1)
 
-        self.text_input = QLineEdit()
-        layout.addWidget(self.text_input)
+        self.text_input_1 = QLineEdit()
+        layout.addWidget(self.text_input_1)
 
         self.label2 = QLabel()
         # self.label2.setFont(QFont('Arial', 14))
@@ -43,6 +43,14 @@ class MyAPIOptionsBox(QDialog):
         cancel_button = QPushButton("Cancel")
         cancel_button.clicked.connect(self.reject)
         layout.addWidget(cancel_button)
+
+        self.setLayout(layout)
+
+    def accept(self):
+        consumer_key = self.text_input_1.text()
+        consumer_secret = self.text_input_2.text()
+        self.values_selected.emit(consumer_key, consumer_secret)
+        super(MyAPIOptionsBox, self).accept()
 
 class MyScrollableMessageBox(QDialog):
     regenerate_button_clicked = pyqtSignal(str)
@@ -91,6 +99,7 @@ class MyScrollableMessageBox(QDialog):
 class MyWindow(QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
+        self.api_keys = []
 
         # Set up the main window
         self.setWindowTitle("Mockingbird UI")
@@ -190,6 +199,7 @@ class MyWindow(QMainWindow):
 
         if result == QDialog.Accepted:
             print("Post button clicked")
+
         elif result == QDialog.Rejected:
             print("Cancel button clicked")
 
@@ -201,10 +211,25 @@ class MyWindow(QMainWindow):
         self.action_rnn.setChecked(True)
         self.action_markov.setChecked(False)
 
+
     def update_action_api(self):
+
+        def get_api_keys(consumer_key, consumer_secret):
+            self.api_keys.append(consumer_key)
+            self.api_keys.append(consumer_secret)
+
         print("Selected action api")
         api_box = MyAPIOptionsBox()
+        api_box.values_selected.connect(get_api_keys)
         result = api_box.exec_()
+        if result == QDialog.Accepted:
+            print(f"API settings applied")
+            for key in self.api_keys:
+                print(key)
+
+        elif result == QDialog.Rejected:
+            print("Canceled API settings")
+
 
 
 if __name__ == "__main__":
