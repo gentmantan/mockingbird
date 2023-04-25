@@ -89,7 +89,7 @@ class MyScrollableMessageBox(QDialog):
         layout.addWidget(regenerate_button)
         layout.addWidget(cancel_button)
 
-
+        self.setLayout(layout)
 
     def on_regenerate_button_clicked(self):
         # Emit the custom signal with a parameter
