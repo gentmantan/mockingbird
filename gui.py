@@ -8,6 +8,42 @@ from PyQt5.QtCore import pyqtSignal
 from run_nlg import generate_text as nlg_gs
 from run_markov import generate_text as markov_gs
 
+class MyAPIOptionsBox(QDialog):
+    def __init__(self):
+        super(MyAPIOptionsBox, self).__init__()
+
+        # Set up the custom QDialog
+        self.setWindowTitle("API Options")
+        self.setGeometry(100, 100, 400, 200)
+        self.setWindowIcon(QIcon('icon.png'))
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        self.label1 = QLabel()
+        # self.label1.setFont(QFont('Arial', 14))
+        self.label1.setText("Consumer Key:")
+        layout.addWidget(self.label1)
+
+        self.text_input = QLineEdit()
+        layout.addWidget(self.text_input)
+
+        self.label2 = QLabel()
+        # self.label2.setFont(QFont('Arial', 14))
+        self.label2.setText("Consumer Secret:")
+        layout.addWidget(self.label2)
+
+        self.text_input_2 = QLineEdit()
+        layout.addWidget(self.text_input_2)
+
+        apply_button = QPushButton("Apply")
+        apply_button.clicked.connect(self.accept)
+        layout.addWidget(apply_button)
+
+        cancel_button = QPushButton("Cancel")
+        cancel_button.clicked.connect(self.reject)
+        layout.addWidget(cancel_button)
+
 class MyScrollableMessageBox(QDialog):
     regenerate_button_clicked = pyqtSignal(str)
     def __init__(self, text):
@@ -45,7 +81,7 @@ class MyScrollableMessageBox(QDialog):
         layout.addWidget(regenerate_button)
         layout.addWidget(cancel_button)
 
-        self.setLayout(layout)
+
 
     def on_regenerate_button_clicked(self):
         # Emit the custom signal with a parameter
@@ -132,8 +168,9 @@ class MyWindow(QMainWindow):
 
         ## Markov options
 
-        action_api = QAction("API Options", self)
-        options_menu.addAction(action_api)
+        self.action_api = QAction("API Options", self)
+        self.action_api.triggered.connect(self.update_action_api)
+        options_menu.addAction(self.action_api)
 
         # action_ngen = QAction("# to Generate", self)
         # options_menu.addAction(action_ngen)
@@ -163,6 +200,12 @@ class MyWindow(QMainWindow):
     def update_action_markov(self):
         self.action_rnn.setChecked(True)
         self.action_markov.setChecked(False)
+
+    def update_action_api(self):
+        print("Selected action api")
+        api_box = MyAPIOptionsBox()
+        result = api_box.exec_()
+
 
 if __name__ == "__main__":
     app = QApplication([])
