@@ -37,4 +37,11 @@ pip install markovify openai transformers language_tool_python pyqt5 requests re
 python gui.py
 ```
 
+### Setup API Keys
 
+![Animated API setup](docs/twitterapisetup.gif)
+
+1. Acquire Twitter Consumer Key and Consumer Secret
+2. Click Options > API Options 
+3. Enter the aforementioned keys
+4. Click Apply
