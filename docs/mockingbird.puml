@@ -1,0 +1,18 @@
+@startuml
+actor User as u #lightblue
+participant Mockingbird as mb
+
+u -> mb: Choose settings
+activate mb
+u -> mb: Enter seed phrase
+u -> mb: Press the generate button
+mb -> mb: Generate text
+create "Generated Text Dialog" as db
+mb -> db: Create
+mb -> db: Pass text
+activate db
+db -> u: Pressent generated text to user
+u -> db: Edit text
+u -> db: Press the post button
+db ->] : Post to Twitter
+@enduml
