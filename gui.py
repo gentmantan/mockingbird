@@ -54,8 +54,7 @@ class MyAPIOptionsBox(QDialog):
         super(MyAPIOptionsBox, self).accept()
 
 class MyScrollableMessageBox(QDialog):
-    regenerate_button_clicked = pyqtSignal(str)
-    final_generated_text = pyqtSignal(str)
+    final_parameters = pyqtSignal(str, bool)
     def __init__(self, text):
         super(MyScrollableMessageBox, self).__init__()
 
@@ -94,12 +93,14 @@ class MyScrollableMessageBox(QDialog):
         self.setLayout(layout)
 
     def on_regenerate_button_clicked(self):
-        # Emit the custom signal with a parameter
-        self.regenerate_button_clicked.emit("Hello from Third Button!")
+        edited_text = self.text_edit.toPlainText()
+
+        self.final_parameters.emit(edited_text, True)
+        super(MyScrollableMessageBox, self).accept()
 
     def on_post_button_clicked(self):
         edited_text = self.text_edit.toPlainText()
-        self.final_generated_text.emit(edited_text)
+        self.final_parameters.emit(edited_text, False)
         super(MyScrollableMessageBox, self).accept()
 
 
@@ -192,9 +193,10 @@ class MyWindow(QMainWindow):
         # options_menu.addAction(action_ngen)
 
     def on_submit(self):
-        self.edited_text = ""
-        def get_edited_text(edited_text):
+        self.do_regenerate = False
+        def get_parameters(edited_text, do_regenerate):
             self.edited_text = edited_text
+            self.do_regenerate = do_regenerate
 
         seed_text = self.text_input.text()
         if self.action_markov.isChecked():
@@ -207,10 +209,12 @@ class MyWindow(QMainWindow):
             generated_text = "Error: text not generated"
 
         msg_box = MyScrollableMessageBox(generated_text)
-        msg_box.final_generated_text.connect(get_edited_text)
+        msg_box.final_parameters.connect(get_parameters)
         result = msg_box.exec_()
 
-        if result == QDialog.Accepted:
+        if self.do_regenerate == True:
+            self.on_submit()
+        elif result == QDialog.Accepted:
             print("Post button clicked")
         elif result == QDialog.Rejected:
             print("Cancel button clicked")
