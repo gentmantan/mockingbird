@@ -107,7 +107,7 @@ class MyScrollableMessageBox(QDialog):
 class MyWindow(QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
-        self.api_keys = []
+        self.api_keys = [-1, -1]
 
         # Set up the main window
         self.setWindowTitle("Mockingbird UI")
@@ -216,6 +216,8 @@ class MyWindow(QMainWindow):
             self.on_submit()
         elif result == QDialog.Accepted:
             print("Post button clicked")
+            post_message(self.edited_text, self.api_keys)
+
         elif result == QDialog.Rejected:
             print("Cancel button clicked")
         else:
