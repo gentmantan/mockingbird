@@ -7,6 +7,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import pyqtSignal
 from run_nlg import generate_text as nlg_gs
 from run_markov import generate_text as markov_gs
+from post import post_message
 
 class MyAPIOptionsBox(QDialog):
     values_selected = pyqtSignal(str, str)
@@ -54,6 +55,7 @@ class MyAPIOptionsBox(QDialog):
 
 class MyScrollableMessageBox(QDialog):
     regenerate_button_clicked = pyqtSignal(str)
+    final_generated_text = pyqtSignal(str)
     def __init__(self, text):
         super(MyScrollableMessageBox, self).__init__()
 
@@ -64,19 +66,19 @@ class MyScrollableMessageBox(QDialog):
         self.setGeometry(100, 100, 400, 200)
 
         # Create a QTextEdit widget
-        text_edit = QTextEdit()
-        # text_edit.setText("just setting up my twttr")
-        text_edit.setPlainText(text)
-        text_edit.setWordWrapMode(True)
+        self.text_edit = QTextEdit()
+        # self.text_edit.setText("just setting up my twttr")
+        self.text_edit.setPlainText(text)
+        self.text_edit.setWordWrapMode(True)
 
         # Create a QScrollArea to hold the QTextEdit widget
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
-        scroll_area.setWidget(text_edit)
+        scroll_area.setWidget(self.text_edit)
 
         # Create buttons for OK and Cancel
         ok_button = QPushButton("Post")
-        ok_button.clicked.connect(self.accept)
+        ok_button.clicked.connect(self.on_post_button_clicked)
         regenerate_button = QPushButton("Regenerate")
         regenerate_button.clicked.connect(self.on_regenerate_button_clicked)
         cancel_button = QPushButton("Cancel")
@@ -94,6 +96,11 @@ class MyScrollableMessageBox(QDialog):
     def on_regenerate_button_clicked(self):
         # Emit the custom signal with a parameter
         self.regenerate_button_clicked.emit("Hello from Third Button!")
+
+    def on_post_button_clicked(self):
+        edited_text = self.text_edit.toPlainText()
+        self.final_generated_text.emit(edited_text)
+        super(MyScrollableMessageBox, self).accept()
 
 
 class MyWindow(QMainWindow):
@@ -185,6 +192,10 @@ class MyWindow(QMainWindow):
         # options_menu.addAction(action_ngen)
 
     def on_submit(self):
+        self.edited_text = ""
+        def get_edited_text(edited_text):
+            self.edited_text = edited_text
+
         seed_text = self.text_input.text()
         if self.action_markov.isChecked():
             print("Markov chosen")
@@ -194,14 +205,17 @@ class MyWindow(QMainWindow):
             generated_text = nlg_gs('nlg_trained_model.h5', 'nlg_tokenizer.pkl', seed_text, 20)
         else:
             generated_text = "Error: text not generated"
+
         msg_box = MyScrollableMessageBox(generated_text)
+        msg_box.final_generated_text.connect(get_edited_text)
         result = msg_box.exec_()
 
         if result == QDialog.Accepted:
             print("Post button clicked")
-
         elif result == QDialog.Rejected:
             print("Cancel button clicked")
+        else:
+            print(result)
 
     def update_action_rnn(self):
         self.action_markov.setChecked(True)
