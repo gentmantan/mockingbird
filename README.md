@@ -6,7 +6,7 @@
         1.  [Install latest python and pip](#orgd35df2d)
     2.  [Run Mockingbird](#orgaca9659)
 
-An implementation of LSTMs for NLG tasks in a PyQt5 UI.
+An implementation of LSTMs and Markov Chains for NLG tasks in a PyQt5 UI.
 
 
 <a id="orgd20d8d7"></a>
@@ -36,6 +36,22 @@ pip install markovify openai transformers language_tool_python pyqt5 requests re
 ``` sh
 python gui.py
 ```
+
+### Generate text
+
+![Animated text generation](docs/text_generation.gif)
+
+1. Enter text to be used as a seed phrase
+2. Click Generate Text
+3. Optionally edit text
+4. Choose to post, regenerate or cancel
+
+### Change between NLG algorithms/models
+
+![Animated algorithm chooser](docs/algorithm_setup.gif)
+
+1. Click Options > Model/Dataset
+2. Choose between desired algorithm
 
 ### Setup API Keys
 
